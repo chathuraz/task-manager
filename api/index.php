@@ -32,27 +32,9 @@ $app->useStoragePath($storagePath);
 
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
-// Test database connection and run migrations
+// Run migrations on first request
 try {
-    // Test database connection
-    $pdo = new \PDO(
-        "mysql:host=" . env('DB_HOST') . ";port=" . env('DB_PORT') . ";dbname=" . env('DB_DATABASE'),
-        env('DB_USERNAME'),
-        env('DB_PASSWORD'),
-        [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_TIMEOUT => 5
-        ]
-    );
-    
-    // Run migrations if tables don't exist
-    $stmt = $pdo->query("SHOW TABLES LIKE 'users'");
-    if (!$stmt->fetch()) {
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        error_log("Migrations completed successfully");
-    }
-} catch (\PDOException $e) {
-    error_log("Database connection error: " . $e->getMessage());
+    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
 } catch (\Exception $e) {
     error_log("Migration error: " . $e->getMessage());
 }
@@ -68,16 +50,12 @@ try {
 } catch (\Throwable $e) {
     // Catch any errors and display them
     http_response_code(500);
-    if (env('APP_DEBUG', false)) {
-        echo "<h1>Error</h1>";
-        echo "<pre>";
-        echo "Message: " . $e->getMessage() . "\n\n";
-        echo "File: " . $e->getFile() . "\n";
-        echo "Line: " . $e->getLine() . "\n\n";
-        echo "Stack Trace:\n" . $e->getTraceAsString();
-        echo "</pre>";
-    } else {
-        echo "500 Server Error";
-    }
+    echo "<h1>Application Error</h1>";
+    echo "<pre>";
+    echo "Message: " . $e->getMessage() . "\n\n";
+    echo "File: " . $e->getFile() . "\n";
+    echo "Line: " . $e->getLine() . "\n\n";
+    echo "Trace:\n" . $e->getTraceAsString();
+    echo "</pre>";
     error_log("Laravel Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
 }
