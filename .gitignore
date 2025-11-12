@@ -13,3 +13,7 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+
+# Keep .env.netlify and .env.production for deployment
+!.env.netlify
+!.env.production

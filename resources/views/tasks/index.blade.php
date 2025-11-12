@@ -9,7 +9,11 @@
         <h1 class="hero-title">Understand <span class="hero-gradient-text">Anything</span></h1>
         <p class="hero-subtitle">Your task management partner, grounded in the organization you trust, built for productivity.</p>
         <div class="mt-4">
-            <a href="{{ route('tasks.create') }}" class="btn btn-primary btn-lg">Try TaskManager</a>
+            @auth
+                <a href="{{ route('tasks.create') }}" class="btn btn-primary btn-lg">Try TaskManager</a>
+            @else
+                <a href="{{ route('register') }}" class="btn btn-primary btn-lg">Try TaskManager</a>
+            @endauth
         </div>
     </div>
 </section>
