@@ -15,6 +15,13 @@ foreach ($dirs as $dir) {
     }
 }
 
+// Create SQLite database file if it doesn't exist
+$dbPath = '/tmp/database.sqlite';
+if (!file_exists($dbPath)) {
+    touch($dbPath);
+    chmod($dbPath, 0666);
+}
+
 // Register the Composer autoloader
 require __DIR__.'/../vendor/autoload.php';
 
@@ -31,6 +38,13 @@ $app = require_once __DIR__.'/../bootstrap/app.php';
 $app->useStoragePath($storagePath);
 
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+// Run migrations on first request (simple auto-migration)
+try {
+    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+} catch (\Exception $e) {
+    // Migrations already run or error - continue anyway
+}
 
 $response = $kernel->handle(
     $request = Illuminate\Http\Request::capture()
