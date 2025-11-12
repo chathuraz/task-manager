@@ -32,9 +32,27 @@ $app->useStoragePath($storagePath);
 
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
-// Run migrations on first request (MySQL)
+// Test database connection and run migrations
 try {
-    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    // Test database connection
+    $pdo = new \PDO(
+        "mysql:host=" . env('DB_HOST') . ";port=" . env('DB_PORT') . ";dbname=" . env('DB_DATABASE'),
+        env('DB_USERNAME'),
+        env('DB_PASSWORD'),
+        [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_TIMEOUT => 5
+        ]
+    );
+    
+    // Run migrations if tables don't exist
+    $stmt = $pdo->query("SHOW TABLES LIKE 'users'");
+    if (!$stmt->fetch()) {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        error_log("Migrations completed successfully");
+    }
+} catch (\PDOException $e) {
+    error_log("Database connection error: " . $e->getMessage());
 } catch (\Exception $e) {
     error_log("Migration error: " . $e->getMessage());
 }
