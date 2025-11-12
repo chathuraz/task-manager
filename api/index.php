@@ -18,6 +18,12 @@ foreach ($dirs as $dir) {
 // Register the Composer autoloader
 require __DIR__.'/../vendor/autoload.php';
 
+// Load production environment file for Vercel
+if (file_exists(__DIR__.'/../.env.production')) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/../', '.env.production');
+    $dotenv->load();
+}
+
 // Bootstrap Laravel and handle the request
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
