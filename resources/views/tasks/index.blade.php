@@ -6,7 +6,7 @@
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="container">
-        <h1 class="hero-title">Understand <span class="hero-gradient-text">Anything</span></h1>
+        <h1 class="hero-title">Manage <span class="hero-gradient-text">Tasks</span></h1>
         <p class="hero-subtitle">Your task management partner, grounded in the organization you trust, built for productivity.</p>
         <div class="mt-4">
             @auth
