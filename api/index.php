@@ -53,10 +53,27 @@ try {
     error_log("Migration error: " . $e->getMessage());
 }
 
-$response = $kernel->handle(
-    $request = Illuminate\Http\Request::capture()
-);
+try {
+    $response = $kernel->handle(
+        $request = Illuminate\Http\Request::capture()
+    );
 
-$response->send();
+    $response->send();
 
-$kernel->terminate($request, $response);
+    $kernel->terminate($request, $response);
+} catch (\Throwable $e) {
+    // Catch any errors and display them
+    http_response_code(500);
+    if (env('APP_DEBUG', false)) {
+        echo "<h1>Error</h1>";
+        echo "<pre>";
+        echo "Message: " . $e->getMessage() . "\n\n";
+        echo "File: " . $e->getFile() . "\n";
+        echo "Line: " . $e->getLine() . "\n\n";
+        echo "Stack Trace:\n" . $e->getTraceAsString();
+        echo "</pre>";
+    } else {
+        echo "500 Server Error";
+    }
+    error_log("Laravel Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
+}
