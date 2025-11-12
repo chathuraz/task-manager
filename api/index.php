@@ -15,13 +15,6 @@ foreach ($dirs as $dir) {
     }
 }
 
-// Create SQLite database file if it doesn't exist
-$dbPath = '/tmp/database.sqlite';
-if (!file_exists($dbPath)) {
-    touch($dbPath);
-    chmod($dbPath, 0666);
-}
-
 // Register the Composer autoloader
 require __DIR__.'/../vendor/autoload.php';
 
@@ -39,16 +32,9 @@ $app->useStoragePath($storagePath);
 
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
-// Run migrations on first request (simple auto-migration)
+// Run migrations on first request (MySQL)
 try {
-    $db = new \PDO('sqlite:' . $dbPath);
-    $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-    
-    // Check if users table exists
-    $result = $db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")->fetch();
-    if (!$result) {
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-    }
+    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
 } catch (\Exception $e) {
     error_log("Migration error: " . $e->getMessage());
 }
