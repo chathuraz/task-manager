@@ -41,9 +41,16 @@ $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
 // Run migrations on first request (simple auto-migration)
 try {
-    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    $db = new \PDO('sqlite:' . $dbPath);
+    $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+    
+    // Check if users table exists
+    $result = $db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")->fetch();
+    if (!$result) {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    }
 } catch (\Exception $e) {
-    // Migrations already run or error - continue anyway
+    error_log("Migration error: " . $e->getMessage());
 }
 
 $response = $kernel->handle(
